@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { TelemetryPanel } from "@/components/TelemetryPanel";
+import { TelemetryCharts } from "@/components/TelemetryCharts";
 import { AssistForm, type AssistFormValues } from "@/components/AssistForm";
 import { GuidanceCard } from "@/components/GuidanceCard";
 import { INITIAL_GATES, tickTelemetry } from "@/lib/telemetry";
