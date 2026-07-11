@@ -11,7 +11,7 @@ import {
 } from "recharts";
 import type { GateTelemetry } from "@/lib/types";
 
-type HistoryPoint = { t: number; label: string } & Record<string, number>;
+type HistoryPoint = { t: number; label: string; [key: string]: number | string };
 
 const COLORS = ["#22d3ee", "#f59e0b", "#a78bfa", "#34d399", "#f472b6", "#60a5fa"];
 const MAX_POINTS = 30;
