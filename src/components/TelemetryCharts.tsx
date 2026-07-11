@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import {
   Line,
   LineChart,
@@ -11,27 +11,41 @@ import {
 } from "recharts";
 import type { GateTelemetry } from "@/lib/types";
 
-type HistoryPoint = { t: number; label: string } & Record<string, number | string | null>;
+type HistoryPoint = { t: number; label: string } & Record<string, number>;
 
 const COLORS = ["#22d3ee", "#f59e0b", "#a78bfa", "#34d399", "#f472b6", "#60a5fa"];
 const MAX_POINTS = 30;
+const MIN_INTERVAL_MS = 1000; // throttle: at most 1 sample/sec into the chart
 
 export function TelemetryCharts({ gates }: { gates: GateTelemetry[] }) {
-  const historyRef = useRef<HistoryPoint[]>([]);
+  const [history, setHistory] = useState<HistoryPoint[]>([]);
+  const lastSampleRef = useRef(0);
 
-  // Append a new snapshot each time gates change.
-  const now = Date.now();
-  const label = new Date(now).toLocaleTimeString([], { hour12: false });
-  const point: HistoryPoint = { t: now, label };
-  gates.forEach((g) => {
-    point[`${g.gate_id}__cap`] = g.current_capacity_pct;
-    point[`${g.gate_id}__flow`] = g.inflow_rate_per_min;
-  });
-  historyRef.current = [...historyRef.current.slice(-(MAX_POINTS - 1)), point];
-  const data = historyRef.current;
+  // Throttled sampler: append at most once per MIN_INTERVAL_MS regardless of
+  // how often `gates` updates upstream.
+  useEffect(() => {
+    const now = Date.now();
+    if (now - lastSampleRef.current < MIN_INTERVAL_MS) return;
+    lastSampleRef.current = now;
 
-  // Force chart re-render when gates change (data derived above).
-  useEffect(() => {}, [gates]);
+    const point: HistoryPoint = {
+      t: now,
+      label: new Date(now).toLocaleTimeString([], { hour12: false }),
+    };
+    for (const g of gates) {
+      point[`${g.gate_id}__cap`] = g.current_capacity_pct;
+      point[`${g.gate_id}__flow`] = g.inflow_rate_per_min;
+    }
+    setHistory((prev) => {
+      const next = prev.length >= MAX_POINTS ? prev.slice(prev.length - MAX_POINTS + 1) : prev;
+      return [...next, point];
+    });
+  }, [gates]);
+
+  // Stable gate identity (id + order) — recharts <Line> keys only need to change
+  // when the roster changes, not on every capacity tick.
+  const gateKey = useMemo(() => gates.map((g) => g.gate_id).join("|"), [gates]);
+  const stableGates = useMemo(() => gates.map((g) => ({ gate_id: g.gate_id })), [gateKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <section
@@ -45,7 +59,7 @@ export function TelemetryCharts({ gates }: { gates: GateTelemetry[] }) {
         >
           Real-Time Gate Dashboard
         </h2>
-        <span className="text-xs text-slate-400">Rolling {MAX_POINTS * 4}s window</span>
+        <span className="text-xs text-slate-400">Rolling {MAX_POINTS}s window</span>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -53,15 +67,15 @@ export function TelemetryCharts({ gates }: { gates: GateTelemetry[] }) {
           title="Capacity %"
           suffix="%"
           domain={[0, 100]}
-          gates={gates}
-          data={data}
+          gates={stableGates}
+          data={history}
           suffixKey="cap"
         />
         <ChartBlock
           title="Inflow rate (people / min)"
           suffix="/min"
-          gates={gates}
-          data={data}
+          gates={stableGates}
+          data={history}
           suffixKey="flow"
         />
       </div>
@@ -71,21 +85,49 @@ export function TelemetryCharts({ gates }: { gates: GateTelemetry[] }) {
   );
 }
 
-function ChartBlock({
+type ChartBlockProps = {
+  title: string;
+  suffix: string;
+  domain?: [number, number];
+  gates: { gate_id: string }[];
+  data: HistoryPoint[];
+  suffixKey: "cap" | "flow";
+};
+
+const ChartBlock = memo(function ChartBlock({
   title,
   suffix,
   domain,
   gates,
   data,
   suffixKey,
-}: {
-  title: string;
-  suffix: string;
-  domain?: [number, number];
-  gates: GateTelemetry[];
-  data: HistoryPoint[];
-  suffixKey: "cap" | "flow";
-}) {
+}: ChartBlockProps) {
+  const lines = useMemo(
+    () =>
+      gates.map((g, i) => (
+        <Line
+          key={g.gate_id}
+          type="monotone"
+          dataKey={`${g.gate_id}__${suffixKey}`}
+          stroke={COLORS[i % COLORS.length]}
+          strokeWidth={2}
+          dot={false}
+          isAnimationActive={false}
+        />
+      )),
+    [gates, suffixKey],
+  );
+
+  const tooltipFormatter = useMemo(
+    () => (v: number, name: string) =>
+      [`${v}${suffix}`, name.replace(`__${suffixKey}`, "")] as [string, string],
+    [suffix, suffixKey],
+  );
+  const legendFormatter = useMemo(
+    () => (v: string) => v.replace(`__${suffixKey}`, ""),
+    [suffixKey],
+  );
+
   return (
     <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-3">
       <p className="mb-2 text-xs font-medium text-slate-300">{title}</p>
@@ -113,31 +155,21 @@ function ChartBlock({
                 fontSize: 12,
               }}
               labelStyle={{ color: "#cbd5e1" }}
-              formatter={(v: number, name: string) => [`${v}${suffix}`, name.replace(`__${suffixKey}`, "")]}
+              formatter={tooltipFormatter}
             />
             <Legend
               wrapperStyle={{ fontSize: 11, color: "#94a3b8" }}
-              formatter={(v: string) => v.replace(`__${suffixKey}`, "")}
+              formatter={legendFormatter}
             />
-            {gates.map((g, i) => (
-              <Line
-                key={g.gate_id}
-                type="monotone"
-                dataKey={`${g.gate_id}__${suffixKey}`}
-                stroke={COLORS[i % COLORS.length]}
-                strokeWidth={2}
-                dot={false}
-                isAnimationActive={false}
-              />
-            ))}
+            {lines}
           </LineChart>
         </ResponsiveContainer>
       </div>
     </div>
   );
-}
+});
 
-function IncidentStrip({ gates }: { gates: GateTelemetry[] }) {
+const IncidentStrip = memo(function IncidentStrip({ gates }: { gates: GateTelemetry[] }) {
   return (
     <div className="mt-5">
       <p className="mb-2 text-xs font-medium text-slate-300">Incident status</p>
@@ -161,4 +193,4 @@ function IncidentStrip({ gates }: { gates: GateTelemetry[] }) {
       </ul>
     </div>
   );
-}
+});
