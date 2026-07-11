@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { TelemetryPanel } from "@/components/TelemetryPanel";
+import { TelemetryCharts } from "@/components/TelemetryCharts";
 import { AssistForm, type AssistFormValues } from "@/components/AssistForm";
 import { GuidanceCard } from "@/components/GuidanceCard";
 import { INITIAL_GATES, tickTelemetry } from "@/lib/telemetry";
@@ -92,6 +93,7 @@ function Index() {
 
         <main className="space-y-6">
           <TelemetryPanel gates={gates} />
+          <TelemetryCharts gates={gates} />
           <div className="grid gap-6 lg:grid-cols-2">
             <AssistForm onSubmit={handleSubmit} loading={loading} />
             <GuidanceCard data={data} language={lang} loading={loading} error={error} />
