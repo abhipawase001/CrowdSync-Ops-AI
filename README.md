@@ -8,6 +8,29 @@ Built on **TanStack Start + React 19 + TypeScript + Tailwind v4**, with reasonin
 
 ---
 
+## Evaluation metric → feature map
+
+Direct pointer from each Challenge 4 scoring criterion to the exact UI element and code path that implements it.
+
+| # | Metric | Impact | Where it lives in the UI | Where it lives in the repo |
+|---|---|---|---|---|
+| 1 | **Real-time dynamic AI reasoning (no hardcoding)** | High | *Guidance card* → `Explainable reasoning` block; `source: gemini` tag proves LLM path | `src/lib/volunteer.functions.ts` — `assistVolunteer` server fn, `generateText` + `Output.object({ schema: LlmSchema })` against Gemini 2.5 Flash |
+| 2 | **Explainable AI (XAI ops log)** | High | `explainable_reasoning` sentence on the guidance card, cites the exact capacity / inflow / incident it used | `LlmSchema.explainable_reasoning` (Zod) + prompt rule #3 in `volunteer.functions.ts`; deterministic mirror in `buildFallback()` |
+| 3 | **Crowd-aware gate diversion** | High | *Recommended gate redirect* badge on guidance card; `CRITICAL_DIVERSION_AND_ASSISTANCE` action badge | `detectCriticalGate` (≥80% or incident) + `detectSafeGate` (lowest load) in `volunteer.functions.ts` |
+| 4 | **Live telemetry / situational awareness** | High | *Live Gate Telemetry* cards (capacity bar, inflow, incident chip) + *Real-Time Gate Dashboard* rolling line charts | `src/lib/telemetry.ts` (`tickTelemetry` 4s interval), `src/components/TelemetryPanel.tsx`, `src/components/TelemetryCharts.tsx` |
+| 5 | **Multilingual fan support** | High | *Translated script* block on guidance card; language dropdown (ES / FR / AR / PT / HI / DE); Arabic renders RTL | `LANGUAGES` in `src/lib/types.ts`; prompt rule #5 in `volunteer.functions.ts`; `src/lib/fallback-translations.ts`; `dir="rtl"` in `src/components/GuidanceCard.tsx` |
+| 6 | **Edge-case resilience (never breaks)** | High | App works with **no** API key; guidance card shows `source: fallback` tag | `buildFallback()` in `volunteer.functions.ts` — triggers on missing key, network error, or `NoObjectGeneratedError` |
+| 7 | **Intent classification (medical / accessibility / standard)** | High | *Action type* badge: `MEDICAL_PRIORITY` / `ACCESSIBILITY_ROUTING` / `STANDARD_ASSISTANCE` / `CRITICAL_DIVERSION_AND_ASSISTANCE` | `classifyIntent()` regex in `volunteer.functions.ts` + `LlmSchema.action_type` enum |
+| 8 | **Security** | Medium | No secrets in DevTools → Sources; server-only `.env` | `process.env.GEMINI_API_KEY` read **inside** `.handler()`; all input Zod-validated at server boundary via `AssistRequestSchema` |
+| 9 | **Performance / efficiency** | Medium | Charts stay smooth as telemetry ticks; ~1–2s AI response | Throttled sampler + `memo` + memoized recharts lines in `TelemetryCharts.tsx`; `gemini-2.5-flash` model; SSR bundle via Vite 7 |
+| 10 | **Accessibility (WCAG AA+)** | Medium | Keyboard-first, visible focus rings, screen-reader-friendly | Semantic `<header>/<main>/<section>`, `aria-live="polite"` on guidance card, `aria-busy` while loading, `role="progressbar"` on capacity bars, `dir="rtl"` for Arabic, ≥4.5:1 contrast |
+| 11 | **Clean README / documentation** | Low | — | This file: judge walkthrough, XAI generation, diversion logic, end-to-end local run, metric map |
+| 12 | **Repo hygiene (single branch, <10 MB)** | Low | — | Pure TS/React, no committed `node_modules`, no data assets, `.gitignore` clean |
+
+---
+
+
+
 ## Judge walkthrough (2 minutes)
 
 Open `/` in the preview. You will see:
