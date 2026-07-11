@@ -107,12 +107,12 @@ INSTRUCTIONS
 6. Only reference gate ids that appear in the telemetry. Set recommended_gate_redirect to null when no diversion is needed.`;
 
     try {
-      const { experimental_output } = await generateText({
+      const { output } = await generateText({
         model,
         prompt,
-        experimental_output: Output.object({ schema: LlmSchema }),
+        output: Output.object({ schema: LlmSchema }),
       });
-      return { ...experimental_output, source: "gemini" };
+      return { ...output, source: "gemini" };
     } catch (error) {
       if (NoObjectGeneratedError.isInstance(error)) {
         try {
