@@ -93,6 +93,7 @@ function Index() {
 
         <main className="space-y-6">
           <TelemetryPanel gates={gates} />
+          <TelemetryCharts gates={gates} />
           <div className="grid gap-6 lg:grid-cols-2">
             <AssistForm onSubmit={handleSubmit} loading={loading} />
             <GuidanceCard data={data} language={lang} loading={loading} error={error} />
