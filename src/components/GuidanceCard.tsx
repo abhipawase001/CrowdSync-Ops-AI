@@ -34,9 +34,9 @@ export function GuidanceCard({
       className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-950/80 to-slate-900/60 p-5 min-h-[280px]"
     >
       <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-        <h2 id="guidance-heading" className="text-sm font-semibold uppercase tracking-widest text-cyan-300">
+        <h3 id="guidance-heading" className="text-sm font-semibold uppercase tracking-widest text-cyan-300">
           🤖 AI Operational Guidance
-        </h2>
+        </h3>
         {data && (
           <div className="flex items-center gap-2">
             <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ${ACTION_STYLES[data.action_type].cls}`}>

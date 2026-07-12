@@ -39,9 +39,9 @@ export function AssistForm({
 
   return (
     <form onSubmit={handle} className="space-y-5 rounded-2xl border border-slate-800 bg-slate-950/60 p-5">
-      <h2 className="text-sm font-semibold uppercase tracking-widest text-cyan-300">
+      <h3 className="text-sm font-semibold uppercase tracking-widest text-cyan-300">
         Dispatch Console
-      </h2>
+      </h3>
 
       <div>
         <label htmlFor="zone" className="block text-sm font-medium text-slate-200 mb-1.5">

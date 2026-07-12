@@ -391,12 +391,12 @@ function Panel({
   return (
     <section className="relative rounded-2xl border border-cyan-500/25 bg-gradient-to-b from-[#08172b]/90 to-[#050d1c]/90 shadow-[0_0_0_1px_rgba(34,211,238,0.05),0_20px_40px_-20px_rgba(0,0,0,0.6)]">
       <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-cyan-500/20 px-4 py-2.5">
-        <h3
+        <h2
           id={id}
           className="min-w-0 truncate text-[11px] font-bold uppercase tracking-[0.22em] text-cyan-100"
         >
           {title}
-        </h3>
+        </h2>
         {tag && (
           <span className="shrink-0 rounded-full border border-emerald-300/50 bg-emerald-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-100">
             {tag}
