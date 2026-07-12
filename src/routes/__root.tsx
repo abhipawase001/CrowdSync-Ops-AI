@@ -90,7 +90,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "Real-time explainable AI routing, live crowd telemetry, and multilingual volunteer scripts for FIFA World Cup 2026 stadium operations.",
       },
-      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://crowd-sync-ai.lovable.app/" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Stadium Ops Center — FIFA 2026 AI Crowd Management" },
       { name: "twitter:description", content: "Real-time explainable AI routing, live crowd telemetry, and multilingual volunteer scripts for FIFA World Cup 2026 stadium operations." },
