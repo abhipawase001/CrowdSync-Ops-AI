@@ -16,22 +16,6 @@ import { LANGUAGES } from "@/lib/types";
 import type { AssistResponse, GateTelemetry } from "@/lib/types";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Stadium Ops Center" },
-      {
-        name: "description",
-        content:
-          "Real-time explainable AI routing, live crowd telemetry, and multilingual volunteer scripts for FIFA World Cup 2026 stadium operations.",
-      },
-      { property: "og:title", content: "Stadium Ops Center" },
-      {
-        property: "og:description",
-        content:
-          "Real-time explainable AI routing, live crowd telemetry, and multilingual volunteer scripts for FIFA World Cup 2026 stadium operations.",
-      },
-    ],
-  }),
   component: Index,
 });
 

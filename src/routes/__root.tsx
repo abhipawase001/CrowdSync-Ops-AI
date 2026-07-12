@@ -77,14 +77,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Stadium Ops Center" },
+      { title: "Stadium Ops Center — FIFA 2026 AI Crowd Management" },
       {
         name: "description",
         content:
           "Real-time explainable AI routing, live crowd telemetry, and multilingual volunteer scripts for FIFA World Cup 2026 stadium operations.",
       },
       { name: "author", content: "CrowdSync AI" },
-      { property: "og:title", content: "Stadium Ops Center" },
+      { property: "og:title", content: "Stadium Ops Center — FIFA 2026 AI Crowd Management" },
       {
         property: "og:description",
         content:
@@ -92,7 +92,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Stadium Ops Center" },
+      { name: "twitter:title", content: "Stadium Ops Center — FIFA 2026 AI Crowd Management" },
       { name: "twitter:description", content: "Real-time explainable AI routing, live crowd telemetry, and multilingual volunteer scripts for FIFA World Cup 2026 stadium operations." },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/df670fe4-0977-40bd-a9b1-47bf95a99fe1/id-preview-09cd68d9--5c9cb1f6-1380-45ff-8ad8-eb1bed31b2f0.lovable.app-1783855225322.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/df670fe4-0977-40bd-a9b1-47bf95a99fe1/id-preview-09cd68d9--5c9cb1f6-1380-45ff-8ad8-eb1bed31b2f0.lovable.app-1783855225322.png" },
@@ -103,6 +103,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "canonical", href: "https://crowd-sync-ai.lovable.app/" },
     ],
   }),
   shellComponent: RootShell,
