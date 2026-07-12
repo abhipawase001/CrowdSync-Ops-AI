@@ -105,6 +105,30 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
       { rel: "canonical", href: "https://crowd-sync-ai.lovable.app/" },
     ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Organization",
+              name: "CrowdSync AI",
+              url: "https://crowd-sync-ai.lovable.app/",
+              logo: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/df670fe4-0977-40bd-a9b1-47bf95a99fe1/id-preview-09cd68d9--5c9cb1f6-1380-45ff-8ad8-eb1bed31b2f0.lovable.app-1783855225322.png",
+            },
+            {
+              "@type": "WebSite",
+              name: "Stadium Ops Center",
+              url: "https://crowd-sync-ai.lovable.app/",
+              author: { "@type": "Organization", name: "CrowdSync AI" },
+              description:
+                "Real-time explainable AI routing, live crowd telemetry, and multilingual volunteer scripts for FIFA World Cup 2026 stadium operations.",
+            },
+          ],
+        }),
+      },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
