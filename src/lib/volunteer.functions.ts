@@ -31,8 +31,9 @@ export const assistVolunteer = createServerFn({ method: "POST" })
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) return buildFallback(data);
 
-    const critical = detectCriticalGate(data);
-    const safe = detectSafeGate(data);
+    const critical = detectCriticalGate(data.telemetry_context);
+    const safe = detectSafeGate(data.telemetry_context);
+
     const intent = classifyIntent(data.query_text);
 
     const provider = createOpenAICompatible({
