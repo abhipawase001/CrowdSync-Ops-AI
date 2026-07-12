@@ -9,6 +9,7 @@ import {
   ChartsSkeleton,
   ErrorBanner,
 } from "@/components/Skeletons";
+import { StadiumHeatmap } from "@/components/StadiumHeatmap";
 import { INITIAL_GATES, tickTelemetry } from "@/lib/telemetry";
 import { assistVolunteer } from "@/lib/volunteer.functions";
 import { LANGUAGES } from "@/lib/types";
