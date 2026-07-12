@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BlogStadiumCrowdManagementBestPracticesRouteImport } from './routes/blog.stadium-crowd-management-best-practices'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -22,31 +23,48 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogStadiumCrowdManagementBestPracticesRoute =
+  BlogStadiumCrowdManagementBestPracticesRouteImport.update({
+    id: '/blog/stadium-crowd-management-best-practices',
+    path: '/blog/stadium-crowd-management-best-practices',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/blog/stadium-crowd-management-best-practices': typeof BlogStadiumCrowdManagementBestPracticesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/blog/stadium-crowd-management-best-practices': typeof BlogStadiumCrowdManagementBestPracticesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/blog/stadium-crowd-management-best-practices': typeof BlogStadiumCrowdManagementBestPracticesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/sitemap.xml'
+  fullPaths:
+    | '/'
+    | '/sitemap.xml'
+    | '/blog/stadium-crowd-management-best-practices'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/sitemap.xml'
-  id: '__root__' | '/' | '/sitemap.xml'
+  to: '/' | '/sitemap.xml' | '/blog/stadium-crowd-management-best-practices'
+  id:
+    | '__root__'
+    | '/'
+    | '/sitemap.xml'
+    | '/blog/stadium-crowd-management-best-practices'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  BlogStadiumCrowdManagementBestPracticesRoute: typeof BlogStadiumCrowdManagementBestPracticesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +83,21 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog/stadium-crowd-management-best-practices': {
+      id: '/blog/stadium-crowd-management-best-practices'
+      path: '/blog/stadium-crowd-management-best-practices'
+      fullPath: '/blog/stadium-crowd-management-best-practices'
+      preLoaderRoute: typeof BlogStadiumCrowdManagementBestPracticesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  BlogStadiumCrowdManagementBestPracticesRoute:
+    BlogStadiumCrowdManagementBestPracticesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
