@@ -80,7 +80,7 @@ describe("stage 1 — pre-flight rule engine", () => {
 describe("stage 1 — intent classification", () => {
   it.each([
     ["fan feels faint", "MEDICAL_PRIORITY"],
-    ["someone is bleeding heavily", "MEDICAL_PRIORITY"],
+    ["blood on the floor near section 12", "MEDICAL_PRIORITY"],
     ["chest pain reported", "MEDICAL_PRIORITY"],
     ["wheelchair user needs help", "ACCESSIBILITY_ROUTING"],
     ["blind visitor seeking guidance", "ACCESSIBILITY_ROUTING"],
