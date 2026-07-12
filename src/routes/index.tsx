@@ -332,6 +332,13 @@ function Index() {
             </section>
 
             <section id="section-ai-insights" className="scroll-mt-24 space-y-5">
+              <Panel title="Stadium Bowl · 3D Live Heatmap" tag="WebGL">
+                {telemetryBooted ? (
+                  <StadiumHeatmap gates={gates} />
+                ) : (
+                  <ChartsSkeleton />
+                )}
+              </Panel>
               <Panel title="Rolling Gate Metrics">
                 {chartsBooted ? (
                   <TelemetryCharts gates={gates} />
