@@ -5,3 +5,4 @@
 ## Pages
 
 - [/](/): Live stadium operations dashboard with real-time gate telemetry, 3D stadium heatmap, AI operational guidance, and multilingual volunteer scripts.
+- [/blog/stadium-crowd-management-best-practices](/blog/stadium-crowd-management-best-practices): Comprehensive guide to AI-driven crowd management at events, covering real-time crowd trackers, explainable AI dispatch, and multilingual communication.
