@@ -1,0 +1,7 @@
+# Stadium Ops Center — CrowdSync AI
+
+> Real-time explainable AI routing, live crowd telemetry, and multilingual volunteer scripts for FIFA World Cup 2026 stadium operations.
+
+## Pages
+
+- [/](/): Live stadium operations dashboard with real-time gate telemetry, 3D stadium heatmap, AI operational guidance, and multilingual volunteer scripts.
