@@ -141,4 +141,37 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
   }
+
+  /* WCAG AAA focus indicator — 3px high-contrast ring w/ dark offset,
+     visible on any keyboard-focused interactive element. */
+  :focus-visible {
+    outline: 3px solid #7dd3fc;
+    outline-offset: 2px;
+    border-radius: 6px;
+    box-shadow: 0 0 0 5px rgba(2, 6, 23, 0.9);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
 }
+
+@utility skip-link {
+  position: absolute;
+  left: -9999px;
+  &:focus, &:focus-visible {
+    left: 1rem;
+    top: 1rem;
+    z-index: 100;
+    background: #0f172a;
+    color: #e0f2fe;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+  }
+}
+
