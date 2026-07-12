@@ -1,0 +1,130 @@
+{
+  "cases": [
+    {
+      "name": "critical gate at 87% triggers diversion to lowest-load gate",
+      "input": {
+        "volunteer_id": "VOL-1042",
+        "zone": "Sector North",
+        "query_text": "fan asking where the nearest restroom is",
+        "target_language": "Spanish",
+        "telemetry_context": [
+          { "gate_id": "Gate C", "current_capacity_pct": 87, "inflow_rate_per_min": 165, "incident_reported": null },
+          { "gate_id": "Gate D", "current_capacity_pct": 38, "inflow_rate_per_min": 52, "incident_reported": null },
+          { "gate_id": "Gate E", "current_capacity_pct": 61, "inflow_rate_per_min": 94, "incident_reported": null }
+        ]
+      },
+      "expect": {
+        "action_type": "CRITICAL_DIVERSION_AND_ASSISTANCE",
+        "recommended_gate_redirect": "Gate D",
+        "reasoning_includes": ["Gate C", "87%", "Gate D"]
+      }
+    },
+    {
+      "name": "incident on any gate triggers diversion even below 80%",
+      "input": {
+        "volunteer_id": "VOL-1042",
+        "zone": "Sector East",
+        "query_text": "fan lost their friend",
+        "target_language": "French",
+        "telemetry_context": [
+          { "gate_id": "Gate A", "current_capacity_pct": 55, "inflow_rate_per_min": 70, "incident_reported": "Turnstile 4 jam" },
+          { "gate_id": "Gate B", "current_capacity_pct": 20, "inflow_rate_per_min": 30, "incident_reported": null }
+        ]
+      },
+      "expect": {
+        "action_type": "CRITICAL_DIVERSION_AND_ASSISTANCE",
+        "recommended_gate_redirect": "Gate B",
+        "reasoning_includes": ["Turnstile 4 jam", "Gate B"]
+      }
+    },
+    {
+      "name": "medical intent with no critical gate stays MEDICAL_PRIORITY, no diversion",
+      "input": {
+        "volunteer_id": "VOL-1042",
+        "zone": "Sector South",
+        "query_text": "fan feels faint and dizzy",
+        "target_language": "Arabic",
+        "telemetry_context": [
+          { "gate_id": "Gate D", "current_capacity_pct": 38, "inflow_rate_per_min": 52, "incident_reported": null },
+          { "gate_id": "Gate E", "current_capacity_pct": 61, "inflow_rate_per_min": 94, "incident_reported": null }
+        ]
+      },
+      "expect": {
+        "action_type": "MEDICAL_PRIORITY",
+        "recommended_gate_redirect": null,
+        "reasoning_includes": ["Gate D", "medical priority"]
+      }
+    },
+    {
+      "name": "accessibility intent routes ACCESSIBILITY_ROUTING when calm",
+      "input": {
+        "volunteer_id": "VOL-1042",
+        "zone": "Sector West",
+        "query_text": "wheelchair user needs the accessible ramp",
+        "target_language": "Portuguese",
+        "telemetry_context": [
+          { "gate_id": "Accessible Ramp A104", "current_capacity_pct": 22, "inflow_rate_per_min": 18, "incident_reported": null },
+          { "gate_id": "Gate E", "current_capacity_pct": 61, "inflow_rate_per_min": 94, "incident_reported": null }
+        ]
+      },
+      "expect": {
+        "action_type": "ACCESSIBILITY_ROUTING",
+        "recommended_gate_redirect": null,
+        "reasoning_includes": ["Accessible Ramp A104", "accessibility routing"]
+      }
+    },
+    {
+      "name": "standard assist when nothing special happens",
+      "input": {
+        "volunteer_id": "VOL-1042",
+        "zone": "Sector North",
+        "query_text": "fan wants merch stand directions",
+        "target_language": "Hindi",
+        "telemetry_context": [
+          { "gate_id": "Gate D", "current_capacity_pct": 38, "inflow_rate_per_min": 52, "incident_reported": null }
+        ]
+      },
+      "expect": {
+        "action_type": "STANDARD_ASSISTANCE",
+        "recommended_gate_redirect": null,
+        "reasoning_includes": ["Gate D", "standard assistance"]
+      }
+    },
+    {
+      "name": "gate at exactly 80% counts as critical (boundary)",
+      "input": {
+        "volunteer_id": "VOL-1042",
+        "zone": "Sector North",
+        "query_text": "fan needs water",
+        "target_language": "German",
+        "telemetry_context": [
+          { "gate_id": "Gate X", "current_capacity_pct": 80, "inflow_rate_per_min": 100, "incident_reported": null },
+          { "gate_id": "Gate Y", "current_capacity_pct": 30, "inflow_rate_per_min": 40, "incident_reported": null }
+        ]
+      },
+      "expect": {
+        "action_type": "CRITICAL_DIVERSION_AND_ASSISTANCE",
+        "recommended_gate_redirect": "Gate Y",
+        "reasoning_includes": ["80%"]
+      }
+    },
+    {
+      "name": "critical wins over medical intent (diversion classification takes precedence)",
+      "input": {
+        "volunteer_id": "VOL-1042",
+        "zone": "Sector East",
+        "query_text": "fan feels faint",
+        "target_language": "Spanish",
+        "telemetry_context": [
+          { "gate_id": "Gate C", "current_capacity_pct": 92, "inflow_rate_per_min": 180, "incident_reported": null },
+          { "gate_id": "Gate D", "current_capacity_pct": 25, "inflow_rate_per_min": 40, "incident_reported": null }
+        ]
+      },
+      "expect": {
+        "action_type": "CRITICAL_DIVERSION_AND_ASSISTANCE",
+        "recommended_gate_redirect": "Gate D",
+        "reasoning_includes": ["Gate C", "92%", "medical priority"]
+      }
+    }
+  ]
+}
