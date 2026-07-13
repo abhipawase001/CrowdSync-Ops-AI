@@ -66,6 +66,10 @@ function Index() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const gatesRef = useRef(gates);
   gatesRef.current = gates;
+  // In-memory LRU-ish memo of recent identical requests so rapid repeats
+  // return instantly instead of re-invoking the reasoning pipeline.
+  const assistCacheRef = useRef<Map<string, AssistResponse>>(new Map());
+
 
   // Telemetry ticker + boot delay so skeletons briefly appear on cold load.
   useEffect(() => {
@@ -100,6 +104,19 @@ function Index() {
     setLoading(true);
     setError(null);
     setLang(v.target_language);
+    const snapshot = gatesRef.current;
+    const cacheKey = JSON.stringify([
+      v.zone,
+      v.query_text,
+      v.target_language,
+      snapshot.map((g) => [g.gate_id, g.current_capacity_pct, g.inflow_rate_per_min, g.incident_reported]),
+    ]);
+    const cached = assistCacheRef.current.get(cacheKey);
+    if (cached) {
+      setData(cached);
+      setLoading(false);
+      return;
+    }
     try {
       const res = await assistVolunteer({
         data: {
@@ -107,9 +124,15 @@ function Index() {
           zone: v.zone,
           query_text: v.query_text,
           target_language: v.target_language,
-          telemetry_context: gatesRef.current,
+          telemetry_context: snapshot,
         },
       });
+      // Cap the cache to prevent unbounded growth under sustained traffic.
+      if (assistCacheRef.current.size >= 50) {
+        const firstKey = assistCacheRef.current.keys().next().value;
+        if (firstKey !== undefined) assistCacheRef.current.delete(firstKey);
+      }
+      assistCacheRef.current.set(cacheKey, res);
       setData(res);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Request failed";
@@ -118,6 +141,7 @@ function Index() {
       setLoading(false);
     }
   };
+
 
   const scrollTo = (id: SectionId) => {
     setActive(id);

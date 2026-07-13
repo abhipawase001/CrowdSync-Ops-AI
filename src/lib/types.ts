@@ -1,11 +1,18 @@
 import { z } from "zod";
 
+// z.number() already rejects NaN; .int() rejects non-integers and Infinity.
+const boundedInt = (min: number, max: number) =>
+  z.number().int().min(min).max(max);
+
 export const GateTelemetrySchema = z.object({
   gate_id: z.string().min(1).max(40),
-  current_capacity_pct: z.number().int().min(0).max(100),
-  inflow_rate_per_min: z.number().int().min(0).max(1000),
+  current_capacity_pct: boundedInt(0, 100),
+  inflow_rate_per_min: boundedInt(0, 1000),
   incident_reported: z.string().max(200).nullable(),
 });
+
+
+
 export type GateTelemetry = z.infer<typeof GateTelemetrySchema>;
 
 export const LANGUAGES = [
