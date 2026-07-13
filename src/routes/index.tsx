@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { TelemetryPanel } from "@/components/TelemetryPanel";
 import { TelemetryCharts } from "@/components/TelemetryCharts";
@@ -303,6 +303,12 @@ function Index() {
                 <p className="text-cyan-200">Operator</p>
                 <p>VOL-1042 · Sector North</p>
               </div>
+              <Link
+                to="/tournament"
+                className="rounded-md border border-emerald-300/50 bg-emerald-500/15 px-3 py-1.5 text-xs font-semibold uppercase tracking-widest text-emerald-100 hover:bg-emerald-500/25"
+              >
+                Tournament Ops →
+              </Link>
             </div>
 
             <section

@@ -9,10 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TournamentRouteImport } from './routes/tournament'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BlogStadiumCrowdManagementBestPracticesRouteImport } from './routes/blog.stadium-crowd-management-best-practices'
 
+const TournamentRoute = TournamentRouteImport.update({
+  id: '/tournament',
+  path: '/tournament',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -33,17 +39,20 @@ const BlogStadiumCrowdManagementBestPracticesRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/tournament': typeof TournamentRoute
   '/blog/stadium-crowd-management-best-practices': typeof BlogStadiumCrowdManagementBestPracticesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/tournament': typeof TournamentRoute
   '/blog/stadium-crowd-management-best-practices': typeof BlogStadiumCrowdManagementBestPracticesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/tournament': typeof TournamentRoute
   '/blog/stadium-crowd-management-best-practices': typeof BlogStadiumCrowdManagementBestPracticesRoute
 }
 export interface FileRouteTypes {
@@ -51,24 +60,38 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/sitemap.xml'
+    | '/tournament'
     | '/blog/stadium-crowd-management-best-practices'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/sitemap.xml' | '/blog/stadium-crowd-management-best-practices'
+  to:
+    | '/'
+    | '/sitemap.xml'
+    | '/tournament'
+    | '/blog/stadium-crowd-management-best-practices'
   id:
     | '__root__'
     | '/'
     | '/sitemap.xml'
+    | '/tournament'
     | '/blog/stadium-crowd-management-best-practices'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TournamentRoute: typeof TournamentRoute
   BlogStadiumCrowdManagementBestPracticesRoute: typeof BlogStadiumCrowdManagementBestPracticesRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/tournament': {
+      id: '/tournament'
+      path: '/tournament'
+      fullPath: '/tournament'
+      preLoaderRoute: typeof TournamentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -96,19 +119,10 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TournamentRoute: TournamentRoute,
   BlogStadiumCrowdManagementBestPracticesRoute:
     BlogStadiumCrowdManagementBestPracticesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
