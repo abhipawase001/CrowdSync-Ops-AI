@@ -18,11 +18,13 @@ const INCIDENTS = [
 ];
 
 export function tickTelemetry(gates: GateTelemetry[]): GateTelemetry[] {
+  if (!Array.isArray(gates) || gates.length === 0) return [];
   return gates.map((g) => {
+    const currentCap = Math.max(0, Math.min(100, g.current_capacity_pct));
+    const currentInflow = Math.max(0, Math.min(1000, g.inflow_rate_per_min));
     const delta = Math.round((Math.random() - 0.45) * 8);
-    const nextCap = Math.max(5, Math.min(99, g.current_capacity_pct + delta));
-    const inflow = Math.max(0, g.inflow_rate_per_min + Math.round((Math.random() - 0.5) * 30));
-    // Occasionally rotate the incident field to prove edge-case handling.
+    const nextCap = Math.max(0, Math.min(100, currentCap + delta));
+    const inflow = Math.max(0, Math.min(1000, currentInflow + Math.round((Math.random() - 0.5) * 30)));
     const roll = Math.random();
     let incident = g.incident_reported;
     if (roll < 0.08) incident = INCIDENTS[Math.floor(Math.random() * INCIDENTS.length)];
@@ -34,3 +36,4 @@ export function tickTelemetry(gates: GateTelemetry[]): GateTelemetry[] {
     };
   });
 }
+

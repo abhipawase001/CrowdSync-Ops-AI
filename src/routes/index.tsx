@@ -13,7 +13,9 @@ import { StadiumHeatmap } from "@/components/StadiumHeatmap";
 import { INITIAL_GATES, tickTelemetry } from "@/lib/telemetry";
 import { assistVolunteer } from "@/lib/volunteer.functions";
 import { LANGUAGES } from "@/lib/types";
+import { clamp } from "@/lib/utils";
 import type { AssistResponse, GateTelemetry } from "@/lib/types";
+
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -433,12 +435,18 @@ function Panel({
 }
 
 function LiveTelemetric({ gates }: { gates: GateTelemetry[] }) {
-  const totalInflow = gates.reduce((s, g) => s + g.inflow_rate_per_min, 0);
-  const avgCap = Math.round(
-    gates.reduce((s, g) => s + g.current_capacity_pct, 0) /
-      Math.max(1, gates.length),
+  const safeGates = Array.isArray(gates) ? gates : [];
+  const totalInflow = safeGates.reduce(
+    (s, g) => s + clamp(g?.inflow_rate_per_min, 0, 1000),
+    0,
   );
-  const incidents = gates.filter((g) => g.incident_reported).length;
+  const avgCap = safeGates.length
+    ? Math.round(
+        safeGates.reduce((s, g) => s + clamp(g?.current_capacity_pct, 0, 100), 0) /
+          safeGates.length,
+      )
+    : 0;
+  const incidents = safeGates.filter((g) => g?.incident_reported).length;
 
   const rows = [
     {
@@ -475,6 +483,7 @@ function LiveTelemetric({ gates }: { gates: GateTelemetry[] }) {
     </ul>
   );
 }
+
 
 function LiveTelemetricSkeleton() {
   return (
