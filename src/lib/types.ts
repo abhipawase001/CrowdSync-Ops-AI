@@ -3,10 +3,10 @@ import { z } from "zod";
 const finiteInt = (min: number, max: number) =>
   z
     .number()
-    .refine((n) => Number.isFinite(n), { message: "must be finite" })
     .int()
     .min(min)
-    .max(max);
+    .max(max)
+    .refine((n) => Number.isFinite(n), { message: "must be finite" });
 
 export const GateTelemetrySchema = z.object({
   gate_id: z.string().min(1).max(40),
@@ -14,6 +14,7 @@ export const GateTelemetrySchema = z.object({
   inflow_rate_per_min: finiteInt(0, 1000),
   incident_reported: z.string().max(200).nullable(),
 });
+
 
 export type GateTelemetry = z.infer<typeof GateTelemetrySchema>;
 
