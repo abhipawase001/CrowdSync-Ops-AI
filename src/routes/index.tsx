@@ -66,6 +66,10 @@ function Index() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const gatesRef = useRef(gates);
   gatesRef.current = gates;
+  // In-memory LRU-ish memo of recent identical requests so rapid repeats
+  // return instantly instead of re-invoking the reasoning pipeline.
+  const assistCacheRef = useRef<Map<string, AssistResponse>>(new Map());
+
 
   // Telemetry ticker + boot delay so skeletons briefly appear on cold load.
   useEffect(() => {
