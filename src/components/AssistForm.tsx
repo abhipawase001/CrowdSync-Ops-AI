@@ -81,13 +81,30 @@ export function AssistForm({
         <textarea
           id="query"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            // Hard cap at MAX_QUERY chars — silently truncate any oversized
+            // paste (e.g. a 10k-char prompt injection attempt) instead of
+            // letting it reach the reasoning pipeline.
+            const next = e.target.value.slice(0, MAX_QUERY);
+            setQuery(next);
+            if (error) setError(null);
+          }}
           rows={3}
           required
-          maxLength={500}
+          maxLength={MAX_QUERY}
+          aria-invalid={error ? true : undefined}
+          aria-describedby="query-help"
           className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2.5 text-slate-100 placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/40"
           placeholder="Describe what the fan needs…"
         />
+        <p id="query-help" className="mt-1 text-xs text-slate-400 tabular-nums">
+          {query.length}/{MAX_QUERY} characters
+        </p>
+        {error && (
+          <p role="alert" className="mt-2 rounded-md border border-red-500/40 bg-red-950/40 px-2 py-1 text-xs text-red-200">
+            {error}
+          </p>
+        )}
         <div className="mt-2 flex flex-wrap gap-1.5">
           {SAMPLE_QUERIES.map((q) => (
             <button
@@ -100,6 +117,7 @@ export function AssistForm({
             </button>
           ))}
         </div>
+
       </div>
 
       <div>
