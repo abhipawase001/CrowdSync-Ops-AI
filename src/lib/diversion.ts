@@ -1,37 +1,69 @@
 // Pure, framework-free diversion + intent logic.
-// Extracted from volunteer.functions.ts so it can be unit-tested without
-// pulling in the server-function runtime.
+// Single-pass scans keep this O(n) with a single traversal and O(1)
+// intent classification via a precompiled keyword regex map.
 
 import type { AssistRequest, AssistResponse, GateTelemetry } from "./types";
 import { fallbackScript } from "./fallback-translations";
 
+export const CRITICAL_CAPACITY_PCT = 80;
+
+// Precompiled once at module load — avoids rebuilding regexes per call.
+const INTENT_PATTERNS: ReadonlyArray<
+  [RegExp, AssistResponse["action_type"]]
+> = [
+  [/faint|dizzy|medical|blood|chest|heart|breath|injur|hurt|sick/, "MEDICAL_PRIORITY"],
+  [/wheelchair|accessible|ramp|mobility|deaf|blind/, "ACCESSIBILITY_ROUTING"],
+];
+
 export function detectSafeGate(gates: GateTelemetry[]): GateTelemetry {
   if (gates.length === 0) throw new Error("telemetry_context is empty");
-  return [...gates].sort(
-    (a, b) => a.current_capacity_pct - b.current_capacity_pct,
-  )[0];
+  let safe = gates[0];
+  for (let i = 1; i < gates.length; i++) {
+    if (gates[i].current_capacity_pct < safe.current_capacity_pct) safe = gates[i];
+  }
+  return safe;
 }
 
 export function detectCriticalGate(
   gates: GateTelemetry[],
 ): GateTelemetry | undefined {
-  return gates.find(
-    (g) => g.current_capacity_pct >= 80 || g.incident_reported,
-  );
+  for (let i = 0; i < gates.length; i++) {
+    const g = gates[i];
+    if (g.current_capacity_pct >= CRITICAL_CAPACITY_PCT || g.incident_reported)
+      return g;
+  }
+  return undefined;
+}
+
+// Single-pass scan returning both critical + safe gates.
+export function scanGates(gates: GateTelemetry[]): {
+  safe: GateTelemetry;
+  critical: GateTelemetry | undefined;
+} {
+  if (gates.length === 0) throw new Error("telemetry_context is empty");
+  let safe = gates[0];
+  let critical: GateTelemetry | undefined;
+  for (let i = 0; i < gates.length; i++) {
+    const g = gates[i];
+    if (g.current_capacity_pct < safe.current_capacity_pct) safe = g;
+    if (!critical && (g.current_capacity_pct >= CRITICAL_CAPACITY_PCT || g.incident_reported)) {
+      critical = g;
+    }
+  }
+  return { safe, critical };
 }
 
 export function classifyIntent(query: string): AssistResponse["action_type"] {
+  if (!query) return "STANDARD_ASSISTANCE";
   const q = query.toLowerCase();
-  if (/faint|dizzy|medical|blood|chest|heart|breath|injur|hurt|sick/.test(q))
-    return "MEDICAL_PRIORITY";
-  if (/wheelchair|accessible|ramp|mobility|deaf|blind/.test(q))
-    return "ACCESSIBILITY_ROUTING";
+  for (let i = 0; i < INTENT_PATTERNS.length; i++) {
+    if (INTENT_PATTERNS[i][0].test(q)) return INTENT_PATTERNS[i][1];
+  }
   return "STANDARD_ASSISTANCE";
 }
 
 export function buildFallback(input: AssistRequest): AssistResponse {
-  const critical = detectCriticalGate(input.telemetry_context);
-  const safe = detectSafeGate(input.telemetry_context);
+  const { safe, critical } = scanGates(input.telemetry_context);
   const intent = classifyIntent(input.query_text);
   const action: AssistResponse["action_type"] = critical
     ? "CRITICAL_DIVERSION_AND_ASSISTANCE"
