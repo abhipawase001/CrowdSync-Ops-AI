@@ -66,7 +66,7 @@ describe("scanGates + buildFallback under stress", () => {
   it("buildFallback never throws on a single-gate array", () => {
     const req = AssistRequestSchema.parse({
       zone: "North",
-      query_text: "hi",
+      query_text: "help",
       target_language: "Spanish",
       telemetry_context: [
         { gate_id: "Only", current_capacity_pct: 55, inflow_rate_per_min: 100, incident_reported: null },
