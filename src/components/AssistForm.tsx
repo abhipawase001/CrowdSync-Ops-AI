@@ -31,11 +31,26 @@ export function AssistForm({
   const [zone, setZone] = useState(ZONES[0]);
   const [query, setQuery] = useState(SAMPLE_QUERIES[0]);
   const [lang, setLang] = useState<(typeof LANGUAGES)[number]>("Spanish");
+  const [error, setError] = useState<string | null>(null);
+  const MAX_QUERY = 500;
 
   const handle = (e: FormEvent) => {
     e.preventDefault();
-    onSubmit({ zone, query_text: query, target_language: lang });
+    const trimmed = query.trim();
+    if (trimmed.length < 3) {
+      setError("Please describe the situation in at least 3 characters.");
+      return;
+    }
+    if (trimmed.length > MAX_QUERY) {
+      setError(
+        `Query is too long (${trimmed.length} chars). Please keep it under ${MAX_QUERY} characters.`,
+      );
+      return;
+    }
+    setError(null);
+    onSubmit({ zone, query_text: trimmed, target_language: lang });
   };
+
 
   return (
     <form onSubmit={handle} className="space-y-5 rounded-2xl border border-slate-800 bg-slate-950/60 p-5">
