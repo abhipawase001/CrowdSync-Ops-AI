@@ -27,7 +27,23 @@ export const LANGUAGES = [
 export const AssistRequestSchema = z.object({
   volunteer_id: z.string().min(1).max(40).default("VOL-1042"),
   zone: z.string().min(1).max(80),
-  query_text: z.string().min(3).max(500),
+  query_text: z
+    .string()
+    .min(3)
+    .max(500)
+    // Strip ASCII control chars and zero-width / bidi-override characters —
+    // common vectors used to hide prompt-injection instructions inside
+    // benign-looking text before it reaches the reasoning pipeline.
+    .transform((s) =>
+      s
+        // eslint-disable-next-line no-control-regex
+        .replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, "")
+        .replace(/[\u200B-\u200F\u202A-\u202E\u2066-\u2069]/g, "")
+        .trim(),
+    )
+    .refine((s) => s.length >= 3, {
+      message: "Query must contain at least 3 visible characters.",
+    }),
   target_language: z.enum(LANGUAGES),
   telemetry_context: z.array(GateTelemetrySchema).min(1).max(12),
 });
