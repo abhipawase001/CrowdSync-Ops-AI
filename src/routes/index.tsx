@@ -13,7 +13,9 @@ import { StadiumHeatmap } from "@/components/StadiumHeatmap";
 import { INITIAL_GATES, tickTelemetry } from "@/lib/telemetry";
 import { assistVolunteer } from "@/lib/volunteer.functions";
 import { LANGUAGES } from "@/lib/types";
+import { clamp } from "@/lib/utils";
 import type { AssistResponse, GateTelemetry } from "@/lib/types";
+
 
 export const Route = createFileRoute("/")({
   component: Index,
