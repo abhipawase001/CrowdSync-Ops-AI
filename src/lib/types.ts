@@ -1,19 +1,16 @@
 import { z } from "zod";
 
-const finiteInt = (min: number, max: number) =>
-  z
-    .number()
-    .int()
-    .min(min)
-    .max(max)
-    .refine((n) => Number.isFinite(n), { message: "must be finite" });
+// z.number() already rejects NaN; .int() rejects non-integers and Infinity.
+const boundedInt = (min: number, max: number) =>
+  z.number().int().min(min).max(max);
 
 export const GateTelemetrySchema = z.object({
   gate_id: z.string().min(1).max(40),
-  current_capacity_pct: finiteInt(0, 100),
-  inflow_rate_per_min: finiteInt(0, 1000),
+  current_capacity_pct: boundedInt(0, 100),
+  inflow_rate_per_min: boundedInt(0, 1000),
   incident_reported: z.string().max(200).nullable(),
 });
+
 
 
 export type GateTelemetry = z.infer<typeof GateTelemetrySchema>;
